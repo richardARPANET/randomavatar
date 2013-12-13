@@ -3,6 +3,10 @@ random avatar
 
 Create pastel style avatars from a given string (such as username). Similar to gravatars.
 
+![](http://i.imgflash.com/s8ue.png "")
+![](http://i.imgflash.com/s7ue.png "")
+![](http://i.imgflash.com/s9ue.png "")
+
 ### Installation
 
 ```bash
