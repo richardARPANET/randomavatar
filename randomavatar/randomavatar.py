@@ -1,5 +1,5 @@
 import random
-import struct
+import math
 import hashlib
 from io import BytesIO
 from PIL import Image, ImageDraw
@@ -8,12 +8,9 @@ from PIL import Image, ImageDraw
 class Avatar(object):
 
     def __init__(self, rows, columns):
-
-        self.fg_colour = self._get_pastel_colour()
-        self.bg_colour = self._get_pastel_colour(lighten=80)
-
         self.rows = rows
         self.cols = columns
+        self._generate_colours()
 
         entropy = len(hashlib.md5("hello world").hexdigest()) / 2 * 8
         if self.rows > 15 or self.cols > 15:
@@ -21,6 +18,24 @@ class Avatar(object):
 
         self.digest = hashlib.md5
         self.digest_entropy = entropy
+
+    def _generate_colours(self):
+        colours_ok = False
+
+        while colours_ok is False:
+            self.fg_colour = self._get_pastel_colour()
+            self.bg_colour = self._get_pastel_colour(lighten=80)
+
+            # Get the luminance for each colour
+            fg_lum = self._luminance(self.fg_colour) + 0.05
+            bg_lum = self._luminance(self.bg_colour) + 0.05
+
+            # Check the difference in luminance
+            # meets the 1.25 threshold
+            result = (fg_lum / bg_lum) \
+                if (fg_lum / bg_lum) else (bg_lum / fg_lum)
+            if result > 1.25:
+                colours_ok = True
 
     def get_image(self, string, width, height, pad=0):
         """
@@ -42,9 +57,22 @@ class Avatar(object):
             Create a pastel colour hex colour string
         """
         r = lambda: random.randint(0, 128) + 127
-        rgb = (r(), r(), r())
-        hex = struct.pack('BBB', *rgb).encode('hex')
-        return '#{0}'.format(hex)
+        return (r(), r(), r())  # return rgb values as a tuple
+
+    def _luminance(self, rgb):
+        """
+        Determine the liminanace of an RGB colour
+        """
+        a = []
+        for v in rgb:
+            v = v / float(255)
+            if v < 0.03928:
+                result = v / 12.92
+            else:
+                result = math.pow(((v + 0.055) / 1.055), 2.4)
+
+            a.append(result)
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722
 
     def _string_to_byte_list(self, data):
         """
@@ -69,7 +97,9 @@ class Avatar(object):
         """
         Check if the n (index) of hash_bytes is 1 or 0.
         """
+
         scale = 16  # hexadecimal
+
         if not hash_bytes[n / (scale / 2)] >> int(
                 (scale / 2) - ((n % (scale / 2)) + 1)) & 1 == 1:
             return False
@@ -127,6 +157,7 @@ class Avatar(object):
         matrix = [[False] * self.cols for num in range(self.rows)]
 
         for cell_number in range(cells):
+
             # If the bit with index corresponding to this cell is 1
             # mark that cell as fg_colour
             # Skip byte 1, that's used in determining fg_colour
