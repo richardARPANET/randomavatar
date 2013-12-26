@@ -34,7 +34,7 @@ class Avatar(object):
             # meets the 1.25 threshold
             result = (fg_lum / bg_lum) \
                 if (fg_lum / bg_lum) else (bg_lum / fg_lum)
-            if result > 1.25:
+            if result > 1.20:
                 colours_ok = True
 
     def get_image(self, string, width, height, pad=0):
