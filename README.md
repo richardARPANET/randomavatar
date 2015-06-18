@@ -1,4 +1,4 @@
-]random avatar
+random avatar
 ======
 
 Create pastel style avatars from a given string (such as username). Similar to gravatars.
