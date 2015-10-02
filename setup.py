@@ -40,7 +40,7 @@ setup(
     author_email='richard@richard.do',
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description='https://github.com/richardasaurus/randomavatar',
-    install_requires=['pillow'],
+    install_requires=['pillow<=2.9.0'],
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
