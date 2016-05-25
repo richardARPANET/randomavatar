@@ -12,7 +12,9 @@ class Avatar(object):
         self.cols = columns
         self._generate_colours()
 
-        entropy = len(hashlib.md5("hello world").hexdigest()) / 2 * 8
+        m = hashlib.md5()
+        m.update(b"hello world")
+        entropy = len(m.hexdigest()) / 2 * 8
         if self.rows > 15 or self.cols > 15:
             raise ValueError("Rows and columns must be valued 15 or under")
 
@@ -85,10 +87,9 @@ class Avatar(object):
         """
         bytes_length = 16
 
-        try:
-            hex_digest = data.decode("hex")
-        except TypeError:
-            hex_digest = self.digest(data).hexdigest()
+        m = self.digest()
+        m.update(str.encode(data))
+        hex_digest = m.hexdigest()
 
         return list(int(hex_digest[num * 2:num * 2 + 2], bytes_length)
                     for num in range(bytes_length))
@@ -100,7 +101,7 @@ class Avatar(object):
 
         scale = 16  # hexadecimal
 
-        if not hash_bytes[n / (scale / 2)] >> int(
+        if not hash_bytes[int(n / (scale / 2))] >> int(
                 (scale / 2) - ((n % (scale / 2)) + 1)) & 1 == 1:
             return False
         return True
@@ -152,7 +153,7 @@ class Avatar(object):
 
         # Number of rows * cols halfed and rounded
         # in order to fill opposite side
-        cells = self.rows * self.cols / 2 + self.cols % 2
+        cells = int(self.rows * self.cols / 2 + self.cols % 2)
 
         matrix = [[False] * self.cols for num in range(self.rows)]
 
@@ -164,7 +165,7 @@ class Avatar(object):
             if self._bit_is_one(cell_number, byte_list[1:]):
                 # Find cell coordinates in matrix.
                 x_row = cell_number % self.rows
-                y_col = cell_number / self.cols
+                y_col = int(cell_number / self.cols)
                 # Set coord True and its opposite side
                 matrix[x_row][self.cols - y_col - 1] = True
                 matrix[x_row][y_col] = True
