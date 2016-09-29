@@ -31,7 +31,7 @@ def get_package_data(package):
 
 setup(
     name='randomavatar',
-    version='0.5.1.dev0',
+    version='0.5.1',
     packages=get_packages('randomavatar'),
     package_data=get_package_data('randomavatar'),
     description='Create pastel style avatars from a given string \
